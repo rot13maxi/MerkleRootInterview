@@ -25,6 +25,9 @@ class Node:
 
 
 class LeafNode(Node):
+    '''
+    Node for the leaves of a merkle tree. refers to actual data
+    '''
     def __init__(self, contents):
         self.contents = contents
 
@@ -35,6 +38,9 @@ class LeafNode(Node):
 
 
 class ParentNode(Node):
+    '''
+    Interior nodes or root node of a merkle tree. Has two children, which should each be a [Node]
+    '''
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -45,6 +51,11 @@ class ParentNode(Node):
 
 
 def make_merkle_tree(items):
+    '''
+    Given a list of items, make a merkle tree that commits to that list
+    :param items: List of items
+    :return: [ParentNode] at the root of the merkle tree
+    '''
     if len(items) == 0:
         return LeafNode(None).hash()
     next_level = []
@@ -68,6 +79,12 @@ def make_merkle_tree(items):
 
 
 def make_merkle_proof(item, root_node):
+    '''
+    Create a proof that the given merkle tree includes the item
+    :param item: item that you want to prove inclusion of
+    :param root_node: [ParentNode] root of the merkle tree. Use [make_merkle_tree] to generate this.
+    :return: A merkle inclusion proof that [item] is included in the set committed to by the hash of [root_node]
+    '''
     item_hash = h(item)
     if isinstance(root_node.left, LeafNode):
         if item_hash == root_node.left.hash():
@@ -86,6 +103,13 @@ def make_merkle_proof(item, root_node):
 
 
 def validate_proof(item, root_hash, proof):
+    '''
+    Validate that the [proof] does in fact prove that [root_hash] commits to a set that includes [item]
+    :param item:
+    :param root_hash:
+    :param proof:
+    :return: boolean result of evaluating the proof
+    '''
     if proof is None:
         return False
 
@@ -126,7 +150,7 @@ def main():
     print("Here's your merkle proof:")
     print(proof)
     print("*************")
-    print("Item is commited to by the merkle root: ", validate_proof(item, tree.hash(), proof))
+    print("Item is committed to by the merkle root: ", validate_proof(item, tree.hash(), proof))
 
 
 if __name__ == '__main__':
